@@ -42,12 +42,12 @@ instance Monad Tree where
           treeList []     = []
 
 instance Foldable Tree where
-  foldMap f (Leaf x) = f x
-  foldMap _ (Node [])   = mempty
+  foldMap f (Leaf x)      = f x
+  foldMap _ (Node [])     = mempty
   foldMap f (Node (c:cs)) = (foldMap f c) `mappend` (foldMap f (Node cs))
 
 instance Traversable Tree where
-  traverse m (Leaf x) = Leaf <$> m x
+  traverse m (Leaf x)        = Leaf <$> m x
   traverse m (Node children) = Node <$> treeList children
     where treeList (t:ts) = (:) <$> traverse m t <*> treeList ts
           treeList []     = pure []
