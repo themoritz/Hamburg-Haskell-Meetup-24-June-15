@@ -43,8 +43,10 @@
 
     <div class="reveal">
 
-      <!-- Any section element inside of this container is displayed as a slide -->
       <div class="slides">
+
+        <!-- Intro -->
+
         <section>
           <h1>Typeclassopedia
           <p>
@@ -53,88 +55,149 @@
         </section>
 
         <section>
+          <h2>Introduction</h2>
+          <ul>
+            <li>How do I map a stateful action over a list?</li>
+            <li>What is the difference between Applicative and Monad?</li>
+            <li>How can I write FromJSON instances using the Applicative interface?</li>
+          </ul>
+          <div class="fragment">
+            <h4>Today</h4>
+            <ul>
+              <li>Functor</li>
+              <li>Applicative</li>
+              <li>Monad</li>
+              <li>Traversable</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Functor -->
+
+        <section>
           <h2>Functor</h2>
+          <small>Container with the ability to map a function over its elements</small>
           <pre><code class="haskell" data-trim contenteditable>
 class Functor f where
   fmap :: (a -> b) -> f a -> f b
           </code></pre>
-          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+          <div class="fragment">
+            <h4>Instances</h4>
+            <pre><code class="haskell" data-trim contenteditable>
 instance Functor [] where
   fmap g (x:xs) = f x : fmap g xs
   fmap _ []     = []
-          </code></pre>
-          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+            </code></pre>
+            <pre><code class="haskell" data-trim contenteditable>
 instance Functor Maybe where
   fmap g (Just x) = Just (g x)
   fmap _ Nothing  = Nothing
-          </code></pre>
-        </section>
-        <section>
-          <h2>Functor - Intuition</h2>
-          <img src="img/functor.png" alt="">
-          <ul class="fragment">
-          <li>A functor f maps a type a into f a</li>
-          <li>fmap <i>lifts</i> a function <pre><code class="haskell">g :: a -> b</code></pre> to a function <pre><code class="haskell">fmap g :: f a -> f b</code></pre></li>
-          </ul>
+            </code></pre>
+          </div>
         </section>
 
         <section>
+          <h2>Functor</h2>
+          <img src="img/functor.png" alt="">
+        </section>
+
+        <section>
+          <h2>Functor</h2>
+          <ul>
+            <li>f a represents a value in a "context"</li>
+            <li>A functor f maps a type a to f a</li>
+            <li>fmap <i>lifts</i> a function <pre><code class="haskell">g :: a -> b</code></pre> to a function <pre><code class="haskell">fmap g :: f a -> f b</code></pre></li>
+          </ul>
+        </section>
+        <section>
+          <h2>Functor Laws</h2>
+          <pre><code class="haskell" data-trim contenteditable>
+fmap id == id
+fmap (g . h) == fmap g . fmap h
+          </code></pre>
+          <ul>
+            <li>A functor should not change the structure of the container.</li>
+            <li>fmap g should only change a value, not its context.</li>
+          </ul>
+        </section>
+
+        <!-- Applicative -->
+
+        <section>
           <h2>Applicative</h2>
+          <small>Function application in a context</small>
           <pre><code class="haskell" data-trim contenteditable>
 class Functor f => Applicative f where
   pure :: a -> f a
   (<*>) :: f (a -> b) -> f a -> f b
           </code></pre>
-          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+          <div class="fragment">
+            <h4>Instances</h4>
+            <pre><code class="haskell" data-trim contenteditable>
 instance Applicative Maybe where
   pure = Just
   Just g  <*> Just x  = Just (g x)
   Just _  <*> Nothing = Nothing
   Nothing <*> _       = Nothing
-          </code></pre>
-          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+            </code></pre>
+            <pre><code class="haskell" data-trim contenteditable>
 instance Applicative [] where
   pure x = [x]
   (g:gs) <*> xs = map g xs ++ (gs <*> xs)
   []     <*> _  = []
-          </code></pre>
-        </section>
-        <section>
-          <h2>Applicative - Intuition</h2>
-          <img src="img/applicative.png" alt="">
-          <ul class="fragment">
-          <li>Allows application of function to multiple arguments inside context:</li>
-          <li><pre><code class="haskell">g <$> a <*> b <*> c</code></pre></li>
-          <li>Idiom brackets <pre><code class="haskell">[| g a b c |]</code></pre></li>
-          <li>Can't use value of function result as basis for next function. Need monads.</li>
-          </ul>
+            </code></pre>
+          </div>
         </section>
 
         <section>
+          <h2>Applicative</h2>
+          <img src="img/applicative.png" alt="">
+        </section>
+
+        <section>
+          <h2>Applicative</h2>
+          <ul>
+            <li>Allows application of function to multiple arguments inside context:
+              <pre><code class="haskell">g <$> a <*> b <*> c</code></pre></li>
+            <li>Idiom brackets <pre><code class="haskell">[| g a b c |]</code></pre></li>
+            <li>Can't use value of function result as basis for next function. Need monads.</li>
+          </ul>
+        </section>
+
+        <!-- Monad -->
+
+        <section>
           <h2>Monad</h2>
+          <small>Chain effectful computations</small>
           <pre><code class="haskell" data-trim contenteditable>
 class Applicative m => Monad m where
   (>>=) :: m a -> (a -> m b) -> m b
           </code></pre>
-          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+          <div class="fragment">
+            <h4>Instances</h4>
+            <pre><code class="haskell" data-trim contenteditable>
 instance Monad Maybe where
   Just x  >>= f = f x
   Nothing >>= _ = Nothing
-          </code></pre>
+            </code></pre>
+          </div>
         </section>
+
         <section>
-          <h2>Monad - Intuition</h2>
+          <h2>Monad</h2>
           <img src="img/monad.png" alt="">
         </section>
+
         <section>
-          <h2>Monad - Intuition</h2>
-          <ul class="fragment">
-          <li>Can use output of earlier computations to decide what computation to run later. More powerful in contrast to applicative.</li>
-          <li>Alternative definition is via: <pre><code class="haskell">join :: m (m a) -> m a</code></pre></li>
-          <li>Tree example: Tree with trees as leaves can be made a tree.</li>
+          <h2>Monad</h2>
+          <ul>
+            <li>Can use output of earlier computations to decide what computation to run later. More powerful in contrast to applicative.</li>
+            <li>Alternative definition is via: <pre><code class="haskell">join :: m (m a) -> m a</code></pre></li>
+            <li>Tree example: Tree with trees as leaves can be made a tree.</li>
           </ul>
         </section>
 
+<!--
         <section>
           <h2>Monoid</h2>
           <pre><code class="haskell" data-trim contenteditable>
@@ -148,32 +211,66 @@ instance Monoid [a] where
   mappend xs ys = xs ++ ys
           </code></pre>
         </section>
-
-        <section>
-          <h2>Foldable</h2>
+ -->
+<!--
+         <section>
+          <h2>foldable</h2>
+          <small>abstract over containers that can be folded into a summary value.</small>
           <pre><code class="haskell" data-trim contenteditable>
-class Foldable t where
-  foldMap :: Monoid b => (a -> b) -> t a -> b
-        </code></pre>
+class foldable t where
+  foldmap :: monoid b => (a -> b) -> t a -> b
+          </code></pre>
+          <pre class="fragment"><code class="haskell" data-trim contenteditable>
+instance foldable [] where
+  foldmap f []     = mempty
+  foldmap f (x:xs) = f x `mappend` foldmap f xs
+          </code></pre>
         </section>
 
         <section>
+          <h2>foldable</h2>
+          <ul>
+            <li></li>
+          </ul>
+        </section>
+-->
+
+        <!-- Traversable -->
+
+        <section>
           <h2>Traversable</h2>
+          <small>Map effectful computations over a container</small>
           <pre><code class="haskell" data-trim contenteditable>
 class (Functor t, Foldable t) => Traversable t where
   traverse  :: Applicative f => (a -> f b) -> t a -> f (t b)
   -- or --
   sequenceA :: Applicative f => t (f a) -> f (t a)
-        </code></pre>
+          </code></pre>
           <pre class="fragment"><code class="haskell" data-trim contenteditable>
 instance Traversable [] where
   traverse m (t:ts) = (:) <$> m t <*> traverse m ts
   traverse _ []     = pure []
-        </code></pre>
+          </code></pre>
         </section>
+
         <section>
-          <h2>Traversable - Intuition</h2>
+          <h2>Traversable</h2>
           <img src="img/traversable.png" alt="">
+          <ul>
+            <li>An "effectful" fmap</li>
+            <li>Also answers the question: When can we commute two functors?</li>
+          </ul>
+        </section>
+
+        <!-- Resources -->
+
+        <section>
+          <h2>End</h2>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://wiki.haskell.org/Typeclassopedia">Haskell Wiki Typeclassopedia</a></li>
+            <li>Pictures taken from <a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Adit's Homepage</a></li>
+          </ul>
         </section>
 
       </div>
