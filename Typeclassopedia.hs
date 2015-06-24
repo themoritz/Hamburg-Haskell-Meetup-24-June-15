@@ -8,6 +8,7 @@ import Data.Traversable
 import Data.Monoid
 
 -- Running example: Tree
+
 data Tree a
   = Leaf a
   | Node [Tree a]
