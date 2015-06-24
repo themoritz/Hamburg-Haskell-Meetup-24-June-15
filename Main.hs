@@ -18,7 +18,7 @@ intTree :: Tree Int
 intTree = Node [Leaf 2, Leaf 5]
 
 intTree2 :: Tree Int
-intTree2 = Node [Leaf 1, Leaf 10]
+intTree2 = Node [Leaf 1, Leaf 10, Leaf 7]
 
 exApplicative :: Tree String
 exApplicative = fTree <*> tree
