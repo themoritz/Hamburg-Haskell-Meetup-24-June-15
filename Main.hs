@@ -15,7 +15,7 @@ fTree :: Tree (String -> String)
 fTree = Node [Leaf id, Leaf reverse]
 
 intTree :: Tree Int
-intTree = Node [Leaf 2, Leaf 5]
+intTree = Node [Leaf 2, Leaf 6]
 
 intTree2 :: Tree Int
 intTree2 = Node [Leaf 1, Node [Leaf 10, Leaf 7]]
@@ -26,6 +26,10 @@ exMonad = do
     y <- intTree2
     if even x then return (x * y)
               else return (x * 2 * y)
+
+exBind :: Tree Int
+exBind = intTree >>= (\x -> if even x then return (x `div` 2)
+                                      else Node (replicate x intTree))
 
 exMonadJoin :: Tree Int
 exMonadJoin = let treeOfTrees = Node [Leaf intTree, Leaf intTree2]
@@ -63,6 +67,8 @@ main = do
 
   putStrLn "Monad 1: Double if value in first tree is even"
   print exMonad
+
+  print exBind
   putStrLn ""
 
   putStrLn "Monad 2: Join tree of trees"

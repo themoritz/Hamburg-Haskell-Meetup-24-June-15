@@ -5,6 +5,7 @@ import Data.List (intercalate)
 import Control.Applicative
 import Data.Foldable hiding (concat)
 import Data.Traversable
+import Prelude hiding (sequence)
 import Data.Monoid
 
 -- Running example: Tree
@@ -25,22 +26,18 @@ showHelper (Node children) = "─┐ " : (concat $ map (indent . showHelper) chi
 -- Typeclassopedia instances
 
 instance Functor Tree where
-  fmap f (Leaf x)        = Leaf (f x)
-  fmap f (Node children) = Node (map (fmap f) children)
+  fmap g (Leaf a) = Leaf (g a)
+  fmap g (Node children) = Node $ map (fmap g) children
 
 instance Applicative Tree where
   pure = Leaf
-  Leaf f        <*> x = fmap f x
-  Node children <*> x = Node $ treeList children
-    where treeList (t:ts) = (t <*> x) : treeList ts
-          treeList []     = []
+  Leaf g        <*> t = fmap g t
+  Node children <*> t = Node $ map (<*> t) children
 
 instance Monad Tree where
-  return = Leaf
+  return = pure
   Leaf x        >>= f = f x
-  Node children >>= f = Node $ treeList children
-    where treeList (t:ts) = (t >>= f) : treeList ts
-          treeList []     = []
+  Node children >>= f = Node $ map (>>= f) children
 
 instance Foldable Tree where
   foldMap f (Leaf x)      = f x
@@ -48,7 +45,5 @@ instance Foldable Tree where
   foldMap f (Node (c:cs)) = (foldMap f c) `mappend` (foldMap f (Node cs))
 
 instance Traversable Tree where
-  traverse m (Leaf x)        = Leaf <$> m x
-  traverse m (Node children) = Node <$> treeList children
-    where treeList (t:ts) = (:) <$> traverse m t <*> treeList ts
-          treeList []     = pure []
+  traverse f (Leaf x)        = Leaf <$> f x
+  traverse f (Node children) = Node <$> sequenceA (map (traverse f) children)
